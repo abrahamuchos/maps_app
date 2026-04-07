@@ -22,6 +22,46 @@ class _MapScreenState extends State<MapScreen> {
         infoWindow: InfoWindow(title: "Casa de Abraham"))
   };
 
+  void addMarker(LatLng latLong) async {
+    TextEditingController textEditController = TextEditingController();
+
+    String? title = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Añade un nombre'),
+          content: TextField(
+            controller: textEditController,
+            decoration: InputDecoration(hintText: "Descripción del punto..."),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(null),
+                child: Text('Cancelar')),
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(context).pop(textEditController.text),
+              child: Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (title != null && title.isNotEmpty) {
+      setState(() {
+        _markers.add(
+          Marker(
+              markerId: MarkerId(latLong.toString()),
+              position: latLong,
+              infoWindow: InfoWindow(
+                title: title,
+              )),
+        );
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +76,7 @@ class _MapScreenState extends State<MapScreen> {
         },
         mapType: MapType.normal,
         markers: _markers,
+        onTap: (latLong) => addMarker(latLong),
       ),
     );
   }
